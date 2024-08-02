@@ -5,6 +5,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const createConnection = (): Connection => {
-  const connectionString = process.env.POSTGRES_CONN_STRING
+  const connectionString = process.env.POSTGRES_URL
   return new Connection(connectionString)
 };
