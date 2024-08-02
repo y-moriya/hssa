@@ -1,5 +1,6 @@
-import { Connection } from 'postgrejs';
 import dotenv from "dotenv";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { createConnection } from "@/utils/util";
 
 dotenv.config()
 
@@ -19,13 +20,7 @@ const syncVideos = async (): Promise<boolean> => {
     throw new Error(`Failed to fetch videos: ${res.statusText}`)
   }
 
-  const conn = new Connection({
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: 'P@ssw0rd',
-    database: 'app',
-  })
+  const conn = createConnection()
 
   try {
     await conn.connect()
@@ -40,7 +35,6 @@ const syncVideos = async (): Promise<boolean> => {
         console.log(`Skipping video ${video.id} because it does not have songs`)
         continue
       }
-
       const existingVideo = await conn.query("SELECT data FROM singing_streams WHERE video_id = $1", { params: [video.id] });
       if (existingVideo.rows?.length) {
         const videoData = existingVideo.rows[0][0];
@@ -62,14 +56,29 @@ const syncVideos = async (): Promise<boolean> => {
       console.log(newVideo)
     }
 
+    return true
   } catch (error) {
-    console.error('Error inserting videos:', error);
-    throw error;
+    console.error('Error syncing videos:', error)
+    return false
   } finally {
-    await conn.close();
+    await conn.close()
   }
-
-  return true
 }
 
-export default syncVideos
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    try {
+      const result = await syncVideos()
+      if (result) {
+        res.status(200).json({ message: 'Videos synced successfully' })
+      } else {
+        res.status(500).json({ error: 'Failed to sync videos' })
+      }
+    } catch (error) {
+      res.status(500).json({ error })
+    }
+  } else {
+    res.setHeader('Allow', ['POST'])
+    res.status(405).end(`Method ${req.method} Not Allowed`)
+  }
+}

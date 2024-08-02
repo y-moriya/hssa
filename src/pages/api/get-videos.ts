@@ -1,8 +1,9 @@
-import type { Video } from "@/types";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { Video } from '@/types';
 import { createConnection } from "@/utils/util";
 
 const getVideos = async (): Promise<Video[]> => {
-  const conn = createConnection();
+  const conn = createConnection()
   try {
     await conn.connect();
     const res = await conn.query(`
@@ -26,10 +27,30 @@ const getVideos = async (): Promise<Video[]> => {
     return videos;
   } catch (error) {
     console.error('Error fetching videos:', error);
-    throw error; // エラーを再スローして呼び出し元でキャッチできるようにする
+    throw error;
   } finally {
     await conn.close();
   }
 };
 
-export { getVideos };
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+}
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'POST') {
+    try {
+      const videos = await getVideos();
+      res.status(200).json(videos);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch videos' });
+    }
+  } else {
+    res.setHeader('Allow', ['POST'])
+    res.status(405).end(`Method ${req.method} Not Allowed`)
+  }
+};
+
+export default handler;

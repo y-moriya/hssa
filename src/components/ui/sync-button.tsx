@@ -9,15 +9,10 @@ export function SyncButton() {
 
   const syncClick = async () => {
     setIsSyncing(true);
-    try {
-      await fetch("/api/sync-videos", {
-        method: "POST",
-      });
-    } catch (error) {
-      console.error("Error syncing videos:", error);
-    } finally {
-      setIsSyncing(false);
-    }
+    await fetch("/api/sync-videos", {
+      method: "POST",
+    });
+    setIsSyncing(false);
   };
 
   return isSyncing ? <Spinner /> : <Button onClick={syncClick}>Sync</Button>;
