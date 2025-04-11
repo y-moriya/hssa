@@ -1,7 +1,7 @@
 import { columns } from "@/app/columns"
 import { DataTable } from "@/components/ui/data-table"
-import { SyncButton } from "@/components/ui/sync-button";
-import { getVideos } from "@/services";
+import { SyncButton } from "@/components/ui/sync-button"
+import { getVideos } from "@/services"
 
 export default async function Home() {
   const data = await getVideos()

@@ -1,3 +1,5 @@
+import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
+
 export interface Video {
   id: string;
   title: string;
@@ -77,4 +79,18 @@ export interface Song {
   start: number;
   itunesid: number;
   original_artist: string;
+}
+
+export interface UseVideosInput {
+  sorting: SortingState;
+  columnFilters: ColumnFiltersState;
+  pagination: PaginationState;
+}
+
+export interface UseVideosResponse {
+  limit: number;
+  page: number;
+  total: number;
+  total_filtered: number;
+  data: Video[];
 }

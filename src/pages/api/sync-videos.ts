@@ -5,7 +5,7 @@ import { createConnection } from "@/utils/util";
 dotenv.config()
 
 const syncVideos = async (): Promise<boolean> => {
-  const apiUrl = "https://holodex.net/api/v2/videos?status=past&type=stream&topic=singing&include=songs&org=Hololive&limit=25"
+  const apiUrl = "https://holodex.net/api/v2/videos?status=past&type=stream&topic=singing&include=songs&org=Hololive&limit=100"
   const apiKey = process.env.HOLODEX_API_KEY
   if (!apiKey) {
     throw new Error("HOLODEX_API_KEY is not set")
